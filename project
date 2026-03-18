@@ -1,0 +1,114 @@
+package project;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+public class Main extends JFrame implements ActionListener {
+    JTextField inputField;
+    JTextArea outputArea;
+    JButton analyzeButton;
+    int[] arr;
+    public Main() {
+        setTitle("Smart Series Analyzer ");
+        setSize(700,400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        JPanel panel = new JPanel(new BorderLayout(10,10));
+        JPanel top = new JPanel();
+        JLabel label = new JLabel("Enter numbers (comma separated):");
+        inputField = new JTextField(25);
+        analyzeButton = new JButton("Analyze Series");
+        analyzeButton.addActionListener(this);
+        top.add(label);
+        top.add(inputField);
+        top.add(analyzeButton);
+        outputArea = new JTextArea();
+        outputArea.setFont(new Font("Monospaced",Font.PLAIN,14));
+        outputArea.setEditable(false);
+        JScrollPane scroll = new JScrollPane(outputArea);
+        panel.add(top,BorderLayout.NORTH);
+        panel.add(scroll,BorderLayout.CENTER);
+        add(panel);
+        setVisible(true);
+    }
+    public void actionPerformed(ActionEvent e) {
+        try {
+            String[] parts = inputField.getText().split(",");
+            int n = parts.length;
+            if(n < 3){
+                JOptionPane.showMessageDialog(this,"Enter at least 3 numbers");
+                return;
+            }
+            arr = new int[n];
+            for(int i=0;i<n;i++){
+                arr[i] = Integer.parseInt(parts[i].trim());
+            }
+            String result = analyzeSeries(arr);
+            outputArea.setText(result);
+        } catch(Exception ex){
+            JOptionPane.showMessageDialog(this,"Invalid Input!");
+        }
+    }
+    public String analyzeSeries(int[] arr){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Series: ");
+        for(int x : arr){
+            sb.append(x).append(" ");
+        }
+        int diff = arr[1] - arr[0];
+        boolean isArithmetic = true;
+        for(int i=2;i<arr.length;i++){
+            if(arr[i] - arr[i-1] != diff){
+                isArithmetic = false;
+                break;
+            }
+        }
+        if(isArithmetic){
+            int next = arr[arr.length-1] + diff;
+            sb.append("\n\nPattern: Arithmetic");
+            sb.append("\nNext Number: ").append(next);
+            return sb.toString();
+        }
+        double ratio = (double)arr[1] / arr[0];
+        boolean isGeometric = true;
+        for(int i=2;i<arr.length;i++){
+            if((double)arr[i] / arr[i-1] != ratio){
+                isGeometric = false;
+                break;
+            }
+        }
+        if(isGeometric){
+            int next = (int)(arr[arr.length-1] * ratio);
+            sb.append("\n\nPattern: Geometric");
+            sb.append("\nNext Number: ").append(next);
+            return sb.toString();
+        }
+        boolean isFibo = true;
+        for(int i=2;i<arr.length;i++){
+            if(arr[i] != arr[i-1] + arr[i-2]){
+                isFibo = false;
+                break;
+            }
+        }
+        if(isFibo){
+            int next = arr[arr.length-1] + arr[arr.length-2];
+            sb.append("\n\nPattern: Fibonacci");
+            sb.append("\nNext Number: ").append(next);
+            return sb.toString();
+        }
+        int d1 = arr[1] - arr[0];
+        int d2 = arr[2] - arr[1];
+        if(d2 == d1 * 2){
+            int lastDiff = arr[arr.length-1] - arr[arr.length-2];
+            int next = arr[arr.length-1] + lastDiff * 2;
+
+            sb.append("\n\nPattern: Doubling Difference");
+            sb.append("\nNext Number: ").append(next);
+            return sb.toString();
+        }
+        sb.append("\n\nPattern: Unknown 🤯");
+        return sb.toString();
+    }
+    public static void main(String[] args) {
+        new Main();
+    }
+}
