@@ -1,0 +1,74 @@
+import java.util.*;
+public class Exception{
+    static Stack<String> undoStack = new Stack<String>();
+    static Stack<String> redoStack = new Stack<String>();
+    static String text = "";
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        do {
+            System.out.println("\n--- Undo Redo Text Editor ---");
+            System.out.println("Current Text: " + text);
+            System.out.println("1. Type Text");
+            System.out.println("2. Undo");
+            System.out.println("3. Redo");
+            System.out.println("4. Clear");
+            System.out.println("5. Exit");
+            System.out.print("Enter Choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+            switch (choice) {
+                case 1:
+                    typeText(sc);
+                    break;
+                case 2:
+                    undo();
+                    break;
+                case 3:
+                    redo();
+                    break;
+                case 4:
+                    clearText();
+                    break;
+                case 5:
+                    System.out.println("Thank You");
+                    break;
+                default:
+                    System.out.println("Invalid Choice");
+            }
+        } while (choice != 5);
+
+        sc.close();
+    }
+    static void typeText(Scanner sc) {
+        undoStack.push(text);
+        redoStack.clear();
+        System.out.print("Enter New Text: ");
+        text = sc.nextLine();
+        System.out.println("Text Updated");
+    }
+    static void undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(text);
+            text = undoStack.pop();
+            System.out.println("Undo Successful");
+        } else {
+            System.out.println("Nothing to Undo");
+        }
+    }
+    static void redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(text);
+            text = redoStack.pop();
+            System.out.println("Redo Successful");
+        } else {
+            System.out.println("Nothing to Redo");
+        }
+    }
+    static void clearText() {
+        undoStack.push(text);
+        redoStack.clear();
+        text = "";
+        System.out.println("Text Cleared");
+    }
+}
