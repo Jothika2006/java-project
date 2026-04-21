@@ -1,0 +1,186 @@
+import java.util.*;
+import java.io.*;
+class Student {
+    int id;
+    String name;
+    int marks;
+    Student next;
+    Student(int id, String name, int marks) {
+        this.id = id;
+        this.name = name;
+        this.marks = marks;
+        next = null;
+    }
+}
+public class ExceptionMiniProject {
+    static Student head = null;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        loadFile();
+        int choice;
+        do {
+            System.out.println("\n--- Smart Student Management ---");
+            System.out.println("1. Insert Student");
+            System.out.println("2. Delete Student");
+            System.out.println("3. Search by ID");
+            System.out.println("4. Sort by Marks");
+            System.out.println("5. Display Students");
+            System.out.println("6. Save & Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    insert(sc);
+                    break;
+                case 2:
+                    delete(sc);
+                    break;
+                case 3:
+                    search(sc);
+                    break;
+                case 4:
+                    sort();
+                    break;
+                case 5:
+                    display();
+                    break;
+                case 6:
+                    saveFile();
+                    System.out.println("Saved Successfully");
+                    break;
+                default:
+                    System.out.println("Invalid Choice");
+            }
+
+        } while (choice != 6);
+        sc.close();
+    }
+    static void insert(Scanner sc) {
+        System.out.print("Enter ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter Marks: ");
+        int marks = sc.nextInt();
+        Student newNode = new Student(id, name, marks);
+        if (head == null)
+            head = newNode;
+        else {
+            Student temp = head;
+            while (temp.next != null)
+                temp = temp.next;
+            temp.next = newNode;
+        }
+
+        System.out.println("Student Added");
+    }
+    static void delete(Scanner sc) {
+        System.out.print("Enter ID to Delete: ");
+        int id = sc.nextInt();
+        if (head == null) {
+            System.out.println("No Students");
+            return;
+        }
+        if (head.id == id) {
+            head = head.next;
+            System.out.println("Deleted");
+            return;
+        }
+        Student temp = head;
+        while (temp.next != null && temp.next.id != id)
+            temp = temp.next;
+        if (temp.next == null)
+            System.out.println("Student Not Found");
+        else {
+            temp.next = temp.next.next;
+            System.out.println("Deleted");
+        }
+    }
+    static void search(Scanner sc) {
+        System.out.print("Enter ID to Search: ");
+        int id = sc.nextInt();
+        Student temp = head;
+        while (temp != null) {
+            if (temp.id == id) {
+                System.out.println("Found: " + temp.id + " " + temp.name + " " + temp.marks);
+                return;
+            }
+            temp = temp.next;
+        }
+        System.out.println("Student Not Found");
+    }
+    static void sort() {
+        if (head == null)
+            return;
+        for (Student i = head; i.next != null; i = i.next) {
+            for (Student j = head; j.next != null; j = j.next) {
+                if (j.marks < j.next.marks) {
+                    int tid = j.id;
+                    String tname = j.name;
+                    int tmarks = j.marks;
+                    j.id = j.next.id;
+                    j.name = j.next.name;
+                    j.marks = j.next.marks;
+                    j.next.id = tid;
+                    j.next.name = tname;
+                    j.next.marks = tmarks;
+                }
+            }
+        }
+        System.out.println("Sorted by Marks");
+    }
+    static void display() {
+        Student temp = head;
+        if (temp == null) {
+            System.out.println("No Students");
+            return;
+        }
+        System.out.println("\nID\tName\tMarks");
+        while (temp != null) {
+            System.out.println(temp.id + "\t" + temp.name + "\t" + temp.marks);
+            temp = temp.next;
+        }
+    }
+    static void saveFile() {
+        try {
+            FileWriter fw = new FileWriter("students.txt");
+            Student temp = head;
+            while (temp != null) {
+                fw.write(temp.id + "," + temp.name + "," + temp.marks + "\n");
+                temp = temp.next;
+            }
+            fw.close();
+        } catch (Exception e) {
+            System.out.println("File Error");
+        }
+    }
+    static void loadFile() {
+        try {
+            File file = new File("students.txt");
+            if (!file.exists())
+                return;
+            Scanner fs = new Scanner(file);
+            while (fs.hasNextLine()) {
+                String line = fs.nextLine();
+                String[] data = line.split(",");
+
+                Student newNode = new Student(
+                        Integer.parseInt(data[0]),
+                        data[1],
+                        Integer.parseInt(data[2]));
+                if (head == null)
+                    head = newNode;
+                else {
+                    Student temp = head;
+                    while (temp.next != null)
+                        temp = temp.next;
+                    temp.next = newNode;
+                }
+            }
+            fs.close();
+        } catch (Exception e) {
+            System.out.println("Load Error");
+        }
+    }
+}
