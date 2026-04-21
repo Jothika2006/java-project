@@ -1,0 +1,137 @@
+import java.util.*;
+public class Exception {
+    static final int MAX = 10;
+    static String[] users = new String[MAX];
+    static int[][] graph = new int[MAX][MAX];
+    static int count = 0;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        do {
+            System.out.println("\n--- Social Network Friend Suggestion ---");
+            System.out.println("1. Add User");
+            System.out.println("2. Add Friendship");
+            System.out.println("3. View Friends");
+            System.out.println("4. Suggest Friends (BFS)");
+            System.out.println("5. DFS Traversal");
+            System.out.println("6. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+            switch (choice) {
+                case 1:
+                    addUser(sc);
+                    break;
+                case 2:
+                    addFriendship(sc);
+                    break;
+                case 3:
+                    viewFriends(sc);
+                    break;
+                case 4:
+                    suggestFriends(sc);
+                    break;
+                case 5:
+                    dfsStart(sc);
+                    break;
+                case 6:
+                    System.out.println("Thank You");
+                    break;
+                default:
+                    System.out.println("Invalid Choice");
+            }
+
+        } while (choice != 6);
+        sc.close();
+    }
+    static void addUser(Scanner sc) {
+        if (count >= MAX) {
+            System.out.println("User Limit Reached");
+            return;
+        }
+        System.out.print("Enter User Name: ");
+        users[count] = sc.nextLine();
+        count++;
+        System.out.println("User Added");
+    }
+    static void addFriendship(Scanner sc) {
+        showUsers();
+        System.out.print("Enter User 1 Number: ");
+        int a = sc.nextInt() - 1;
+        System.out.print("Enter User 2 Number: ");
+        int b = sc.nextInt() - 1;
+        if (a >= 0 && b >= 0 && a < count && b < count && a != b) {
+            graph[a][b] = 1;
+            graph[b][a] = 1;
+            System.out.println("Friendship Added");
+        } else {
+            System.out.println("Invalid Input");
+        }
+    }
+    static void viewFriends(Scanner sc) {
+        showUsers();
+        System.out.print("Enter User Number: ");
+        int u = sc.nextInt() - 1;
+        if (u < 0 || u >= count) {
+            System.out.println("Invalid User");
+            return;
+        }
+        System.out.println("Friends of " + users[u] + ":");
+        for (int i = 0; i < count; i++) {
+            if (graph[u][i] == 1)
+                System.out.println(users[i]);
+        }
+    }
+    static void suggestFriends(Scanner sc) {
+        showUsers();
+        System.out.print("Enter User Number: ");
+        int u = sc.nextInt() - 1;
+        if (u < 0 || u >= count) {
+            System.out.println("Invalid User");
+            return;
+        }
+        boolean[] visited = new boolean[MAX];
+        Queue<Integer> q = new LinkedList<>();
+        visited[u] = true;
+        q.add(u);
+        System.out.println("Suggested Friends for " + users[u] + ":");
+        while (!q.isEmpty()) {
+            int x = q.remove();
+            for (int i = 0; i < count; i++) {
+                if (graph[x][i] == 1 && !visited[i]) {
+                    visited[i] = true;
+                    q.add(i);
+                    if (graph[u][i] == 0)
+                        System.out.println(users[i]);
+                }
+            }
+        }
+    }
+
+    static void dfsStart(Scanner sc) {
+        showUsers();
+        System.out.print("Enter Start User Number: ");
+        int u = sc.nextInt() - 1;
+        if (u < 0 || u >= count) {
+            System.out.println("Invalid User");
+            return;
+        }
+        boolean[] visited = new boolean[MAX];
+        System.out.println("DFS Traversal:");
+        dfs(u, visited);
+    }
+    static void dfs(int u, boolean[] visited) {
+        visited[u] = true;
+        System.out.println(users[u]);
+        for (int i = 0; i < count; i++) {
+            if (graph[u][i] == 1 && !visited[i])
+                dfs(i, visited);
+        }
+    }
+    static void showUsers() {
+        System.out.println("\nUsers:");
+        for (int i = 0; i < count; i++) {
+            System.out.println((i + 1) + ". " + users[i]);
+        }
+    }
+}
